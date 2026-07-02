@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<DTS:ConnectionManager xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:ObjectName="Datawarehouse"
+  DTS:DTSID="{07D00FE5-7FF9-46B3-AB46-9F6DCCC7A3F5}"
+  DTS:CreationName="OLEDB">
+  <DTS:PropertyExpression
+    DTS:Name="ServerName">@[$Project::SQL_Server]</DTS:PropertyExpression>
+  <DTS:ObjectData>
+    <DTS:ConnectionManager
+      DTS:ConnectRetryCount="1"
+      DTS:ConnectRetryInterval="5"
+      DTS:ConnectionString="Data Source=localhost;Initial Catalog=datawarehouse;Provider=MSOLEDBSQL.1;Integrated Security=SSPI;Application Name=SSIS-EjecutarPaquetes-{07D00FE5-7FF9-46B3-AB46-9F6DCCC7A3F5}Conexión de datos;Auto Translate=False;" />
+  </DTS:ObjectData>
+</DTS:ConnectionManager>

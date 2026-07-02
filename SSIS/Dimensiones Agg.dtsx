@@ -1,0 +1,111 @@
+﻿<?xml version="1.0"?>
+<DTS:Executable xmlns:DTS="www.microsoft.com/SqlServer/Dts"
+  DTS:refId="Package"
+  DTS:CreationDate="6/1/2026 1:32:07 PM"
+  DTS:CreationName="Microsoft.Package"
+  DTS:CreatorComputerName="MARTIN-PC"
+  DTS:CreatorName="MARTIN-PC\marti"
+  DTS:DTSID="{D868F9EF-CCB4-4623-A868-3B0CE345A750}"
+  DTS:ExecutableType="Microsoft.Package"
+  DTS:LastModifiedProductVersion="17.0.1016.0"
+  DTS:LocaleID="1033"
+  DTS:ObjectName="Dimensiones Agg"
+  DTS:PackageType="5"
+  DTS:VersionBuild="11"
+  DTS:VersionGUID="{15C2B1CA-6B3A-43C4-B4B4-C8D34A840D6F}">
+  <DTS:Property
+    DTS:Name="PackageFormatVersion">8</DTS:Property>
+  <DTS:Variables />
+  <DTS:Executables>
+    <DTS:Executable
+      DTS:refId="Package\Crear Time"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Tarea Ejecutar SQL"
+      DTS:DTSID="{2CC7B68B-DA6B-4FE6-A30D-5A35AF34A596}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Crear Time"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{69DE55A5-17C3-404F-B31E-7938F3514F15}"
+          SQLTask:SqlStatementSource="IF OBJECT_ID('dbo.dim_Time', 'U') IS NULL&#xA;BEGIN&#xA;    CREATE TABLE dbo.dim_Time (&#xA;        TIME_KEY      INT PRIMARY KEY,&#xA;        DATE_VALUE    DATE NOT NULL,&#xA;        [YEAR]        INT,&#xA;        [MONTH]       INT,&#xA;        [DAY]         INT,&#xA;        MONTH_NAME    NVARCHAR(20),&#xA;        DAY_NAME      NVARCHAR(20),&#xA;        [QUARTER]     INT,&#xA;        DAY_WEEK      INT,&#xA;        IS_WEEKEND    BIT&#xA;    );&#xA;END" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+    <DTS:Executable
+      DTS:refId="Package\Poblar Time"
+      DTS:CreationName="Microsoft.ExecuteSQLTask"
+      DTS:Description="Tarea Ejecutar SQL"
+      DTS:DTSID="{C7245165-9D29-479A-822A-54258070D003}"
+      DTS:ExecutableType="Microsoft.ExecuteSQLTask"
+      DTS:LocaleID="-1"
+      DTS:ObjectName="Poblar Time"
+      DTS:TaskContact="Execute SQL Task; Microsoft Corporation; SQL Server 2025; © 2025 Microsoft Corporation; All Rights Reserved;http://www.microsoft.com/sql/support/default.asp;1"
+      DTS:ThreadHint="0">
+      <DTS:Variables />
+      <DTS:ObjectData>
+        <SQLTask:SqlTaskData
+          SQLTask:Connection="{69DE55A5-17C3-404F-B31E-7938F3514F15}"
+          SQLTask:SqlStatementSource="SET LANGUAGE English;&#xA;SET DATEFIRST 1; -- Monday = 1&#xA;&#xA;DECLARE @FechaInicio DATE = '2005-01-01';&#xA;DECLARE @FechaFin    DATE = '2030-12-31';&#xA;&#xA;;WITH Fecha AS (&#xA;    &#xA;    -- Fecha inicial&#xA;    SELECT @FechaInicio AS Fecha&#xA;&#xA;    UNION ALL&#xA;&#xA;    -- Incremento de 1 día&#xA;    SELECT DATEADD(DAY, 1, Fecha)&#xA;    FROM Fecha&#xA;    WHERE Fecha &lt; @FechaFin&#xA;)&#xA;&#xA;INSERT INTO Dim_Time (&#xA;    TIME_KEY,&#xA;    DATE_VALUE,&#xA;    [YEAR],&#xA;    [MONTH],&#xA;    [DAY],&#xA;    [MONTH_NAME],&#xA;    [DAY_NAME],&#xA;    [QUARTER],&#xA;    [DAY_WEEK],&#xA;    [IS_WEEKEND]&#xA;)&#xA;&#xA;SELECT&#xA;    -- Clave tipo YYYYMMDD&#xA;    CONVERT(INT, CONVERT(VARCHAR(8), Fecha, 112)) AS TIME_KEY,&#xA;&#xA;    -- Fecha completa&#xA;    Fecha AS DATE_VALUE,&#xA;&#xA;    -- Componentes temporales&#xA;    YEAR(Fecha) AS [YEAR],&#xA;    MONTH(Fecha) AS [MONTH],&#xA;    DAY(Fecha) AS [DAY],&#xA;&#xA;    -- Nombres en inglés&#xA;    DATENAME(MONTH, Fecha) AS [MONTH_NAME],&#xA;    DATENAME(WEEKDAY, Fecha) AS [DAY_NAME],&#xA;&#xA;    -- Trimestre&#xA;    DATEPART(QUARTER, Fecha) AS [QUARTER],&#xA;&#xA;    -- Lunes = 1&#xA;    DATEPART(WEEKDAY, Fecha) AS [DAY_WEEK],&#xA;&#xA;    -- Sábado(6) o Domingo(7)&#xA;    CASE&#xA;        WHEN DATEPART(WEEKDAY, Fecha) IN (6,7) THEN 1&#xA;        ELSE 0&#xA;    END AS [IS_WEEKEND]&#xA;&#xA;FROM Fecha&#xA;&#xA;WHERE NOT EXISTS (&#xA;    SELECT 1&#xA;    FROM Dim_Time T&#xA;    WHERE T.TIME_KEY = CONVERT(INT, CONVERT(VARCHAR(8), Fecha, 112))&#xA;)&#xA;&#xA;OPTION (MAXRECURSION 0);" xmlns:SQLTask="www.microsoft.com/sqlserver/dts/tasks/sqltask" />
+      </DTS:ObjectData>
+    </DTS:Executable>
+  </DTS:Executables>
+  <DTS:PrecedenceConstraints>
+    <DTS:PrecedenceConstraint
+      DTS:refId="Package.PrecedenceConstraints[Restricción]"
+      DTS:CreationName=""
+      DTS:DTSID="{B2AB888C-980B-48D9-94FF-5FDBA5C66A95}"
+      DTS:From="Package\Crear Time"
+      DTS:LogicalAnd="True"
+      DTS:ObjectName="Restricción"
+      DTS:To="Package\Poblar Time" />
+  </DTS:PrecedenceConstraints>
+  <DTS:DesignTimeProperties><![CDATA[<?xml version="1.0"?>
+<!--Esta sección CDATA contiene la información de diseño del paquete. Esta sección incluye información como, por ejemplo, las coordenadas (x,y), el ancho y el alto.-->
+<!--Si edita manualmente esta sección y comete un error, puede eliminarlo. -->
+<!--El paquete podrá cargarse normalmente, pero se perderá la información de diseño anterior y el diseñador reorganizará los elementos automáticamente en la superficie de diseño.-->
+<Objects
+  Version="8">
+  <!--Cada uno de los nodos siguientes contiene propiedades que no afectan al comportamiento en tiempo de ejecución.-->
+  <Package
+    design-time-name="Package">
+    <LayoutInfo>
+      <GraphLayout
+        Capacity="4" xmlns="clr-namespace:Microsoft.SqlServer.IntegrationServices.Designer.Model.Serialization;assembly=Microsoft.SqlServer.IntegrationServices.Graph" xmlns:mssgle="clr-namespace:Microsoft.SqlServer.Graph.LayoutEngine;assembly=Microsoft.SqlServer.Graph" xmlns:assembly="http://schemas.microsoft.com/winfx/2006/xaml">
+        <NodeLayout
+          Size="134,42"
+          Id="Package\Crear Time"
+          TopLeft="440,95" />
+        <NodeLayout
+          Size="138,42"
+          Id="Package\Poblar Time"
+          TopLeft="442.5,183.5" />
+        <EdgeLayout
+          Id="Package.PrecedenceConstraints[Restricción]"
+          TopLeft="509.25,137">
+          <EdgeLayout.Curve>
+            <mssgle:Curve
+              StartConnector="{assembly:Null}"
+              EndConnector="0,46.5"
+              Start="0,0"
+              End="0,39">
+              <mssgle:Curve.Segments>
+                <mssgle:SegmentCollection
+                  Capacity="5">
+                  <mssgle:LineSegment
+                    End="0,39" />
+                </mssgle:SegmentCollection>
+              </mssgle:Curve.Segments>
+            </mssgle:Curve>
+          </EdgeLayout.Curve>
+          <EdgeLayout.Labels>
+            <EdgeLabelCollection />
+          </EdgeLayout.Labels>
+        </EdgeLayout>
+      </GraphLayout>
+    </LayoutInfo>
+  </Package>
+</Objects>]]></DTS:DesignTimeProperties>
+</DTS:Executable>
